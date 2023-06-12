@@ -8,7 +8,13 @@ const createNav = () => {
                     <input type="text" class="search-box" placeholder="search brand, product">
                     <button class="search-btn"> Search </button>
                 </div>
-                <a href="#"><img src="img/user.png" alt=""></a>
+                <a>
+                    <img src="img/user.png" id="user-img" alt="">
+                    <div class="login-logout-popup hide">
+                        <p class="account-info"><Log in as, name</p>
+                        <button class="btn" id="user-btn">Log Out</button>
+                    </div>
+                </a>
                 <a href="#"><img src="img/cart.png" alt=""></a>
             </div>
         </div>
@@ -23,3 +29,24 @@ const createNav = () => {
 }
 createNav();
 
+
+//nav popup
+
+const userImageButton = document.querySelector('#user-img');
+const userPopup = document.querySelector('.login-logout-popup');
+const popuptext = document.querySelector('.account-info');
+const actionBtn = document.querySelector('#user-btn');
+
+userImageButton.addEventListener('click', () => {
+    userPopup.classList.toggle('hide');
+})
+
+window.onload= () => {
+    let user = JSSON.parse(sessionStorage.user || null);
+    if(user != null){
+        //means user is logged in
+        popuptext.innerHTML = `log in as, ${user.name}`;
+    }else {
+        //user is logged out
+    }
+}
