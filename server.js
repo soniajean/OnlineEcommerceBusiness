@@ -11,6 +11,8 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
 });
 
+let db = admin.firestore();
+
 //declare static path
 let staticPath = path.join(__dirname, "public");
 
@@ -46,16 +48,53 @@ app.post('/signup', (req, res) => {
         return res.json({'alert': 'enter your phone number'});
     } else if (!Number(number) || number.length < 10){
         return res.json({'alert': 'invalid number, please enter a valid one'});
-    }else if (!tac.checked){
+    }else if (!tac){
         return res.json({'alert': 'you must agree to the terms and conditions'});
-    }else { 
-        // 
     }
+    //store in db
+
+    db.collection('users').doc(email).get()
+    .then(user => {
+        if(user.exists){
+            return res.json({'alert': 'email already exists'});
+        } else{
+            //encrypt the password before storing it
+            bcrypt.genSalt(10, (err, salt) => {
+                bcrypt.hash(password, salt, (err, hash) => {
+                    req.body.password = hash;
+                    db.collection('users').doc(email).set(req.body)
+                    .then(data =>{
+                        res.json({
+                            name: req.body.name,
+                            email: req.body.email,
+                            seller: req.body.seller,
+                        })
+                    })
+
+                })
+            })
+        }
+    })
 
 
-    res.json('data received');
 })
+//login route
+app.get('/login', (req, res) => {
+    res.sendFile(path.join(staticPath, "login.html"));
+})
+app.post('/login', (req, res) => {
+    let {email, password} = req.body;
+    if(!email.length || !password.length){
+        return res.json({'alert': 'fill all the inputs'})
+    }
+    db.collection('users').doc(email).get()
+    .then(user =>{
+        if(!user.exists){ //is email do not exist
+            return res.json({'alert': 'login email does'})
+        }
 
+    })
+})
 //404 route
 app.get("/404", (req, res) => {
     res.sendFile(path.join(staticPath, "404.html"));
