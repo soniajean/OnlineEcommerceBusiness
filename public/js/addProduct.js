@@ -115,6 +115,8 @@ const validateForm = () => {
 }
 
 const productData = () => {
+    let tagArr = tags.value.split(',');
+    tagArr.forEach((item, i) => tagArr[i] = tagArr[i].trim());
     return data = {
         name: productName.value,
         shortDes: shortLine.value,
@@ -125,7 +127,7 @@ const productData = () => {
         discount: discountPercentage.value,
         sellPrice: sellingPrice.value,
         stock: stock.value,
-        tags: tags.value,
+        tags: tagArr,
         tac: tac.checked,
         email: user.email
     }
@@ -194,8 +196,6 @@ const setFormsData = (data) => {
 }
 
 const fetchProductData = () => {
-    // delete the tempProduct from the session
-    delete sessionStorage.tempProduct;
     fetch('/get-products', {
         method: 'post',
         headers: new Headers({'Content-Type': 'application/json'}),
@@ -214,9 +214,5 @@ let productId = null;
 if(location.pathname != '/add-product'){
     productId = decodeURI(location.pathname.split('/').pop());
 
-    let productDetail = JSON.parse(sessionStorage.tempProduct || null);
-    // fetch the data if product is not in session
-    // if(productDetail == null){
-        fetchProductData();
-    // }
+    fetchProductData();
 }

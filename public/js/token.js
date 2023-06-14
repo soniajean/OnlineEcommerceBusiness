@@ -40,7 +40,11 @@ const sendData = (path, data) => {
 const processData = (data) => {
     loader.style.display = null;
     if(data.alert){
-        showAlert(data.alert);
+        if(data.type){
+            showAlert(data.alert, 'success');
+        } else{
+            showAlert(data.alert);
+        }
     } else if(data.name){
         // create authToken
         data.authToken = generateToken(data.email);
@@ -52,16 +56,30 @@ const processData = (data) => {
         user.seller = true;
         sessionStorage.user = JSON.stringify(user);
         location.reload();
+    } else if(data.product){
+        location.href = '/seller';
     }
 }
 
 // alert function
-const showAlert = (msg) => {
+const showAlert = (msg, type='error') => {
     let alertBox = document.querySelector('.alert-box');
     let alertMsg = document.querySelector('.alert-msg');
+    let alertImg = document.querySelector('.alert-img');
+
     alertMsg.innerHTML = msg;
+
+    if(type == 'success'){
+        alertImg.src = `img/success.png`;
+        alertMsg.style.color = `#0ab50a`;
+    } else{ // means it is an err
+        alertImg.src = `img/error.png`;
+        alertMsg.style.color = null;
+    }
+
     alertBox.classList.add('show');
     setTimeout(() => {
         alertBox.classList.remove('show');
     }, 3000);
+    return false;
 }
